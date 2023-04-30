@@ -1,0 +1,232 @@
+import meter.*;
+import processing.serial.*;
+
+Serial port;
+
+
+Meter m, m2, m3, m4, m5, m6;
+
+void setup() {
+  size(1400, 900);
+  background(255, 255, 200);
+  
+  port = new Serial(this, "COM4", 9600);
+
+  fill(120, 50, 0);
+  m = new Meter(this, 50, 100);
+  // Adjust font color of meter value  +
+  m.setMeterWidth(400);
+
+  m.setTitleFontSize(20);
+  m.setTitleFontName("Arial bold");
+  m.setTitle("UV (dV/m^2)");
+  m.setDisplayDigitalMeterValue(true);
+  
+  // Meter Scale
+    String[] scaleLabelsT = {"0", "3", "6", "9", "12", "15", "18", "21", "24", "27"};
+ // String[] scaleLabelsT = {"0", "30", "60", "90", "120", "150", "180", "210", "240", "270", "300"};
+  m.setScaleLabels(scaleLabelsT);
+  m.setScaleFontSize(18);
+  m.setScaleFontName("Times New Roman bold");
+  m.setScaleFontColor(color(200, 30, 70));
+  
+  m.setArcColor(color(141, 113, 178));
+  m.setArcThickness(10);
+ m.setMaxScaleValue(27);
+  
+  m.setNeedleThickness(3);
+  
+  m.setMinInputSignal(0);
+  m.setMaxInputSignal(27);
+
+  // A second meter for reference
+  int mx = m.getMeterX();
+  int my = m.getMeterY();
+  int mw = m.getMeterWidth();
+  
+  
+  
+  m2 = new Meter(this, mx + mw + 20, my);
+  m2.setMeterWidth(400);
+  m2.setTitleFontSize(20);
+  m2.setTitleFontName("Arial bold");
+  m2.setTitle("Ozono (pp10m)");
+  m2.setDisplayDigitalMeterValue(true);
+  
+  String[] scaleLabelsH = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+  m2.setScaleLabels(scaleLabelsH);
+  m2.setScaleFontSize(18);
+  m2.setScaleFontName("Times New Roman bold");
+  m2.setScaleFontColor(color(200, 30, 70));
+  
+  m2.setArcColor(color(141, 113, 178));
+  m2.setArcThickness(10);
+  m2.setMaxScaleValue(10);
+  
+  m2.setNeedleThickness(3);
+  
+  m2.setMinInputSignal(0);
+  m2.setMaxInputSignal(10);
+  
+  // A third meter for reference
+  int m2x = m2.getMeterX();
+  int m2y = m2.getMeterY();
+  int m2w = m2.getMeterWidth();
+  
+  
+  
+  m3 = new Meter(this, m2x + m2w + 20, my);
+  m3.setMeterWidth(400);
+  m3.setTitleFontSize(20);
+  m3.setTitleFontName("Arial bold");
+  m3.setTitle("Temperatura (ºC)");
+  m3.setDisplayDigitalMeterValue(true);
+  
+  String[] scaleLabelsP = {"0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50"};
+  m3.setScaleLabels(scaleLabelsP);
+  m3.setScaleFontSize(15);
+  m3.setScaleFontName("Times New Roman bold");
+  m3.setScaleFontColor(color(200, 30, 70));
+  
+  m3.setArcColor(color(141, 113, 178));
+  m3.setArcThickness(10);
+  m3.setMaxScaleValue(50);
+  
+  m3.setNeedleThickness(3);
+  
+  m3.setMinInputSignal(0);
+  m3.setMaxInputSignal(50);
+  
+  // Cuarto indicador
+  int m3x = m3.getMeterX();
+  int m3y = m3.getMeterY();
+  int m3w = m3.getMeterWidth();
+  
+  
+  
+  m4 = new Meter(this, 50 , my + 235);
+  m4.setMeterWidth(400);
+  m4.setTitleFontSize(20);
+  m4.setTitleFontName("Arial bold");
+  m4.setTitle("Presión (Pa)");
+  m4.setDisplayDigitalMeterValue(true);
+  
+  String[] scaleLabelsY = {"0", "100000", "200000", "300000", "400000", "500000", "600000", "700000", "800000", "900000", "1000000"};
+  //String[] scaleLabelsR = {"0", "1", "2", "2", "3", "4", "5", "6", "7", "8", "9"};
+  m4.setScaleLabels(scaleLabelsY);
+  m4.setScaleFontSize(15);
+  m4.setScaleFontName("Times New Roman bold");
+  m4.setScaleFontColor(color(200, 30, 70));
+  
+  m4.setArcColor(color(141, 113, 178));
+  m4.setArcThickness(10);
+  m4.setMaxScaleValue(1000000);
+  
+  m4.setNeedleThickness(3);
+  
+  m4.setMinInputSignal(0);
+  m4.setMaxInputSignal(1000000);
+  
+  // Quinto indicador
+  int m4x = m4.getMeterX();
+  int m4y = m4.getMeterY();
+  int m4w = m4.getMeterWidth();  
+  
+  
+  
+  
+  
+   m5 = new Meter(this, m4x + m4w + 20 , my + 250);
+  m5.setMeterWidth(400);
+  m5.setTitleFontSize(20);
+  m5.setTitleFontName("Arial bold");
+  m5.setTitle("Altitud (m)");
+  m5.setDisplayDigitalMeterValue(true);
+  
+  String[] scaleLabelsM = {"0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500"};
+  //String[] scaleLabelsR = {"0", "1", "2", "2", "3", "4", "5", "6", "7", "8", "9"};
+  m5.setScaleLabels(scaleLabelsM);
+  m5.setScaleFontSize(15);
+  m5.setScaleFontName("Times New Roman bold");
+  m5.setScaleFontColor(color(200, 30, 70));
+  
+  m5.setArcColor(color(141, 113, 178));
+  m5.setArcThickness(10);
+  m5.setMaxScaleValue(500);
+  
+  m5.setNeedleThickness(3);
+  
+  m5.setMinInputSignal(0);
+  m5.setMaxInputSignal(500);
+  
+  // Quinto indicador
+  int m5x = m5.getMeterX();
+  int m5y = m5.getMeterY();
+  int m5w = m5.getMeterWidth();  
+ 
+ 
+ 
+    m6 = new Meter(this, m5x + m5w + 20 , my + 250);
+  m6.setMeterWidth(400);
+  m6.setTitleFontSize(20);
+  m6.setTitleFontName("Arial bold");
+  m6.setTitle("Metano (ppm)");
+  m6.setDisplayDigitalMeterValue(true);
+  
+  String[] scaleLabelsS = {"0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"};
+  //String[] scaleLabelsR = {"0", "1", "2", "2", "3", "4", "5", "6", "7", "8", "9"};
+  m6.setScaleLabels(scaleLabelsS);
+  m6.setScaleFontSize(15);
+  m6.setScaleFontName("Times New Roman bold");
+  m6.setScaleFontColor(color(200, 30, 70));
+  
+  m6.setArcColor(color(141, 113, 178));
+  m6.setArcThickness(10);
+  m6.setMaxScaleValue(100);
+  
+  m6.setNeedleThickness(3);
+  
+  m6.setMinInputSignal(0);
+  m6.setMaxInputSignal(100);
+  
+  // Quinto indicador
+  //int m6x = m6.getMeterX();
+  //int m6y = m6.getMeterY();
+  //int m6w = m6.getMeterWidth();  
+ 
+  
+  
+}
+
+public void draw() {
+  
+  textSize(70);
+  fill(255, 128, 0);
+  text("IB SAT", 600, 70);
+  
+  if (port.available() > 0) {
+    String val = port.readString();
+    String[] list = split(val, ',');
+           
+    float UV = float(list[0]);
+    float ozone = float(list[1]);
+    float tmp = float(list[2]);
+    float pres = float(list[3]);
+    float alt = float(list[4]);
+    float methane = float(list[5]);
+   
+
+    
+    println(" UV= " + UV + " dV/m^3 " + " Ozono= " + ozone + " pp100m " + " Temperatura= " + tmp + " ºC " + " Presión= " + pres + " hPa " + " Altitud= " + alt + " m " + " Methane= " + methane + " pp10m");
+    
+    m.updateMeter(int(UV));
+    m2.updateMeter(int(ozone));
+    m3.updateMeter(int(tmp));
+    m4.updateMeter(int(pres));
+    m5.updateMeter(int(alt));
+    m6.updateMeter(int(methane));
+   
+  
+    delay(1000);   
+  }
+}
