@@ -1,0 +1,340 @@
+//0. mq-2 -> Metano y butano
+int sensorPan = A0; // Conexión analógica del sensor MQ2 al pin A0 del Arduino
+float sensorValua; // Variable que almacena el valor de lectura del sensor
+float methane; // Variable que almacena la concentración de metano en ppm
+float butane; // Variable que almacena la concentración de butano en ppm
+
+
+
+//1. mq-7 -> CO
+int sensorPen = A1; // Conexión analógica del sensor MQ7 al pin A0 del Arduino
+float sensorValue; // Variable que almacena el valor de lectura del sensor
+float ppmCO; // Variable que almacena la concentración de CO en ppm
+
+
+
+//2. guva-s12sd
+int sensorPin = A2; // Conexión analógica del sensor GUVA-S12SD al pin A0 del Arduino
+float sensorValui; // Variable que almacena el valor de lectura del sensor
+float uvIntensity; // Variable que almacena la intensidad UV en V/cm^3
+
+
+//3. O3
+int sensorPon = A3; // Conexión analógica del sensor MQ131 al pin A0 del Arduino
+float sensorValuo; // Variable que almacena el valor de lectura del sensor
+float ozone; // Variable que almacena la concentración de ozono en ppm
+
+//4. BMP280 - TMP, PRES, ALT
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_BMP280.h>
+
+#define BMP280_ADDRESS 0x76
+Adafruit_BMP280 bmp; // I2C
+
+
+//5. MQ138 - OH
+int sensorPun = A6; // Pin analógico al que está conectado el pin de señal del sensor
+float R0 = 8.5; // Valor de resistencia del sensor en aire limpio
+float RoAlcohol = 1.25; // Valor de resistencia del sensor en presencia de alcohol
+float K = 2.5; // Constante de calibración del sensor
+
+
+//6. sd
+#include <SD.h>
+
+File myFile;
+
+//7. PROCESSING
+
+float hh = 0;
+  float jj = 0;
+  float ll = 0;
+  float nn = 0;
+  float pp = 0;
+  float ww= 0;
+
+
+//8. RADIO
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial apcSerial(2, 3); // RX, TX
+
+
+
+
+
+void setup() {
+  Serial.begin(9600); // Inicialización de la comunicación serial
+
+
+
+apcSerial.begin(9600);
+
+//4. BMP280 - TMP, PRES, ALT
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+  while ( !Serial );   // wait for native usb
+  //Serial.println(F("BMP280 test"));
+  unsigned status;
+  status = bmp.begin(BMP280_ADDRESS);
+  if (!status) {
+    Serial.println(F("Could not find a valid BMP280 sensor, check wiring or "
+                      "try a different address!"));
+   /* Serial.print("SensorID was: 0x"); Serial.println(bmp.sensorID(),16);
+    Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+    Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
+    Serial.print("        ID of 0x60 represents a BME 280.\n");
+    Serial.print("        ID of 0x61 represents a BME 680.\n");
+    while (1) delay(10);
+    */
+  }
+
+  /* Default settings from datasheet. */
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+
+    //5. SD
+    
+SD.begin(4);
+    //if (!SD.begin(4))
+    //{
+      //Serial.print("SD NO EXITO");
+    //SD.begin(4);
+    //}
+    //else
+    //{
+     // Serial.print("SD ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!");
+    //}
+   // Serial.print("SD exito!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!");              
+}
+
+void loop() {
+
+  
+//0. mq-2 -> Metano y Butano
+  sensorValua = analogRead(sensorPan);
+  
+  // Calcular la concentración de metano en ppm utilizando la ecuación proporcionada por el fabricante del sensor
+  methane = ((1.0996 * pow(10, 1.0009 * ((sensorValua / 1024.0) - 1))))*100;
+  
+  // Calcular la concentración de butano en ppm utilizando la ecuación proporcionada por el fabricante del sensor
+  butane = (0.9356 * pow(10, 1.3802 * ((sensorValua / 1024.0) - 1)));
+  
+  // Imprimir la concentración de metano y butano en ppm en la consola serial
+ 
+    // Serial.print(methane);
+   //  Serial.print(",");
+  
+    // Serial.print(butane);
+  //  Serial.print(",");
+
+if (methane > 100)
+{
+methane = 100;
+}
+
+
+
+
+if (butane > 1)
+{
+butane = 1;
+}
+
+  
+
+//1. mq-7 -> CO
+  sensorValue = analogRead(sensorPen);
+  
+  // Calcular la concentración de CO en ppm utilizando la ecuación proporcionada por el fabricante del sensor
+  ppmCO = (1.0275 * pow(10, 1.6769 * ((sensorValue / 1024.0) - 1)));
+  
+  // Imprimir la concentración de CO en ppm en la consola serial
+    // Serial.print(ppmCO);
+  // Serial.print(",");
+  
+if (ppmCO > 1)
+{
+ppmCO = 1;
+}
+
+
+  
+//2. guva-s12d
+ sensorValui = analogRead(sensorPin);
+  
+  // Convertir el valor del sensor en una intensidad UV en V/cm^3 utilizando la ecuación proporcionada por el fabricante del sensor
+  uvIntensity = ( sensorValui * (5.0 / 1024.0) / 0.1) * 10;
+  
+  // Imprimir la intensidad UV en dV/cm^3 en la consola serial
+   //  Serial.print(uvIntensity);
+  // Serial.print(",");
+
+if (uvIntensity > 27)
+{
+uvIntensity = 27;
+}
+
+
+
+
+  
+//3. mq131 -> O3
+   sensorValuo = analogRead(sensorPon);
+  
+  // Calcular la concentración de ozono en ppm utilizando la ecuación proporcionada por el fabricante del sensor
+  ozone = ((sensorValuo * 0.005) / 10.0)*100;
+  
+  // Imprimir la concentración de ozono en ppm en la consola serial
+    // Serial.print(ozone);
+  // Serial.print(",");
+if (ozone > 10)
+{
+ozone = 10;
+}
+
+
+//4. BMP280 - TMP, PRES, ALT
+
+    //   Serial.print(bmp.readTemperature());
+  // Serial.print(",");
+
+
+    //   Serial.print(bmp.readPressure());
+  // Serial.print(",");
+
+
+     //  Serial.print(bmp.readAltitude(1013.25)); /* Adjusted to local forecast! */
+  // Serial.print(",");
+
+int tem = bmp.readTemperature();
+if ( tem > 50)
+{
+tem = 50;
+}
+/*
+int pres = bmp.readPressure();
+if (pres > 100000)
+{
+pres = 100000;
+}
+*/
+int alt = bmp.readAltitude(1013.25);
+if (alt > 500)
+{
+alt = 500;
+}
+
+
+
+
+  //5. MQ138 - OH
+  int sensorValue = analogRead(sensorPun); // Leer el valor analógico del pin de señal del sensor
+  
+ 
+float Rs = ((1023.0 / sensorValue) - 1) * R0; // Calcular la resistencia del sensor en función del valor analógico
+  float ppm = (pow(10, ((log10(Rs / RoAlcohol) - K) / -0.307))); // Calcular la concentración de alcohol en ppm
+
+  
+
+
+
+
+   //  Serial.print(ppm);
+  // Serial.print(",");
+   // delay(1000);
+//SD
+  myFile = SD.open("datalog.txt", FILE_WRITE);//abrimos  el archivo
+  
+  if (myFile) { 
+      //  Serial.print("Escribiendo SD: ");
+        
+        myFile.print("Tiempo(ms)=");
+        myFile.print(millis());
+
+        //ESCRIBE CO EN SD
+        myFile.print(", CO: ");
+        myFile.print(ppmCO);
+       myFile.print(",");
+        
+        //ESCRIBE METANO EN SD
+       myFile.print(" metano:");
+        myFile.print(methane);
+        myFile.print(",");
+        //ESCRIBE BUTANO EN SD
+        
+        myFile.print("butano: ");
+        myFile.print(butane);      
+       myFile.print(",");     
+
+        //ESCRIBE UV
+        myFile.print("UV");
+        myFile.print(uvIntensity);
+        myFile.print(",");
+
+        //ESCRIBE O3
+       myFile.print("O3:");
+        myFile.print(ozone);
+        myFile.print(",");
+
+        //ESCRIBE TEMPERATURA
+       myFile.print("temperatura:");  
+        myFile.print(bmp.readPressure());
+        myFile.print(",");
+
+        //ESCRIBE PRESIÓN
+       myFile.print("presión:");
+        myFile.println(bmp.readPressure());
+        myFile.print(",");
+
+        //ESCRIBE ALTITUD
+    
+        myFile.print("Altitud:");
+        myFile.print(alt);
+       myFile.print(",");
+
+        //ESCRIBE OH
+        
+        myFile.print("Alcohol:");
+        myFile.print(ppm);
+       myFile.println();
+                            
+                     
+       myFile.close(); //cerramos el archivo
+      
+        }
+
+        
+//7. PROCESSING
+
+
+  float hh = uvIntensity;
+  float jj = ozone;
+  float ll = tem;
+  float xx = bmp.readPressure();
+  float pp = alt;
+  float ww= methane;
+
+
+
+
+
+Serial.print((float)hh);//UV
+Serial.print(",");
+Serial.print((float)jj);//O3
+Serial.print(",");
+Serial.print((float)ll);//tmp
+Serial.print(",");
+Serial.print((float)xx);//presión
+Serial.print(",");
+Serial.print((float)pp);//altitud
+Serial.print(",");
+Serial.println((float)ww);//metano
+
+delay(100);
+
+          }
